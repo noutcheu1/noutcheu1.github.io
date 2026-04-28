@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Libert Noutcheu — Software & Data Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.14);
+    --accent: #6ee7b7;
+    --accent2: #818cf8;
+    --accent3: #f472b6;
+    --text: #f0f0f5;
+    --muted: #8888a0;
+    --muted2: #555568;
+    --mono: 'DM Mono', monospace;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'Syne', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: .4;
+  }
+
+  /* GRID BACKGROUND */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(110,231,183,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(110,231,183,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1.2rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: .08em;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* SECTIONS */
+  section { position: relative; z-index: 1; }
+
+  /* HERO */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 8rem 2rem 4rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .hero-inner { width: 100%; }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    border: 1px solid rgba(110,231,183,0.2);
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    letter-spacing: .1em;
+  }
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 1.0;
+    letter-spacing: -.02em;
+    margin-bottom: 1.5rem;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--accent2);
+  }
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+    font-weight: 400;
+  }
+  .hero-sub strong { color: var(--text); font-weight: 600; }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: all .2s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0f;
+  }
+  .btn-primary:hover { background: #a7f3d0; transform: translateY(-2px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border2);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 4rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+  }
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--accent);
+    display: block;
+  }
+  .stat-lbl {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+
+  /* FLOATING TAGS */
+  .hero-tags {
+    position: absolute;
+    right: 0; top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted2);
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    letter-spacing: .06em;
+  }
+  .tag.active { color: var(--accent); border-color: rgba(110,231,183,0.3); }
+
+  /* ABOUT */
+  #about {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.1;
+    margin-bottom: 2rem;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+  .about-text { color: var(--muted); line-height: 1.9; font-size: .95rem; }
+  .about-text p { margin-bottom: 1.2rem; }
+  .about-text strong { color: var(--text); }
+  .about-cards { display: flex; flex-direction: column; gap: 12px; }
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.2rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .info-card-icon {
+    width: 36px; height: 36px;
+    background: rgba(110,231,183,0.08);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .info-card-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .info-card-value { font-size: 14px; color: var(--text); font-weight: 500; margin-top: 2px; }
+
+  /* SKILLS */
+  #skills {
+    padding: 6rem 2rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .skills-inner { max-width: 1200px; margin: 0 auto; }
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .skill-block {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    transition: border-color .2s;
+  }
+  .skill-block:hover { border-color: rgba(110,231,183,0.3); }
+  .skill-block-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: 1rem;
+    padding-bottom: .8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .skill-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 2px;
+    transition: all .15s;
+  }
+  .skill-pill:hover { color: var(--accent); border-color: rgba(110,231,183,0.3); }
+  .skill-pill.hot { color: var(--accent); border-color: rgba(110,231,183,0.25); background: rgba(110,231,183,0.04); }
+
+  /* EXPERIENCE */
+  #experience {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .timeline { margin-top: 3rem; }
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 3rem;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-left { }
+  .tl-period {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: .06em;
+    margin-bottom: .5rem;
+  }
+  .tl-company {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: .3rem;
+  }
+  .tl-location {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+  .tl-duration {
+    display: inline-block;
+    margin-top: .6rem;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    border: 1px solid rgba(129,140,248,0.2);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .tl-role {
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+  .tl-bullets { list-style: none; }
+  .tl-bullets li {
+    font-size: .88rem;
+    color: var(--muted);
+    line-height: 1.7;
+    padding: .5rem 0 .5rem 1.5rem;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+  }
+  .tl-bullets li:last-child { border-bottom: none; }
+  .tl-bullets li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 12px;
+    top: .55rem;
+  }
+  .tl-bullets strong { color: var(--text); font-weight: 500; }
+  .tl-result {
+    display: inline-block;
+    background: rgba(110,231,183,0.08);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-left: 4px;
+  }
+
+  /* PROJECTS */
+  #projects {
+    padding: 6rem 2rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .projects-inner { max-width: 1200px; margin: 0 auto; }
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .project-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.8rem;
+    transition: all .25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .project-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+  .project-card:hover::before { opacity: 1; }
+  .project-type {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: .8rem;
+  }
+  .project-title {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    color: var(--text);
+    margin-bottom: .8rem;
+    line-height: 1.2;
+  }
+  .project-desc {
+    font-size: .82rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1.2rem;
+  }
+  .project-stack { display: flex; flex-wrap: wrap; gap: 5px; }
+  .stack-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .project-metric {
+    margin-top: 1.2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  /* EDUCATION */
+  #education {
+    padding: 6rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .edu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .edu-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.8rem;
+    transition: border-color .2s;
+  }
+  .edu-card:hover { border-color: rgba(129,140,248,0.3); }
+  .edu-degree {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    color: var(--text);
+    margin-bottom: .5rem;
+  }
+  .edu-school { font-size: .9rem; color: var(--muted); margin-bottom: .4rem; }
+  .edu-period {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+  }
+  .edu-badge {
+    display: inline-block;
+    margin-top: .8rem;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    background: rgba(110,231,183,0.08);
+    border: 1px solid rgba(110,231,183,0.2);
+    padding: 3px 9px;
+    border-radius: 2px;
+  }
+
+  /* CONTACT */
+  #contact {
+    padding: 6rem 2rem 8rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .contact-inner { max-width: 1200px; margin: 0 auto; }
+  .contact-hero {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .contact-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  .contact-title em { font-style: italic; color: var(--accent); }
+  .contact-sub { color: var(--muted); font-size: .95rem; }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .contact-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+    transition: all .2s;
+    display: block;
+  }
+  .contact-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .contact-card-icon { font-size: 20px; margin-bottom: .6rem; display: block; }
+  .contact-card-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: .3rem; }
+  .contact-card-value { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted2);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 900px) {
+    .about-grid, .skills-grid, .projects-grid { grid-template-columns: 1fr; }
+    .timeline-item { grid-template-columns: 1fr; gap: 1rem; }
+    .contact-grid { grid-template-columns: repeat(2,1fr); }
+    .edu-grid { grid-template-columns: 1fr; }
+    .hero-tags { display: none; }
+    .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">LN.portfolio</span>
+  <ul class="nav-links">
+    <li><a href="#about">À propos</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Expérience</a></li>
+    <li><a href="#projects">Projets</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner fade-up">
+    <div class="hero-badge">DISPONIBLE — ALTERNANCE SEPT. 2026</div>
+    <h1 class="hero-title">
+      Libert<br><em>Noutcheu</em>
+    </h1>
+    <p class="hero-sub">
+      <strong>Software Engineer & Data Engineer</strong> — je construis des pipelines IA industriels,
+      refactorise du code Python en production, et déploie des modèles ML sur des systèmes Linux.
+      Basé à Rennes, mobilité France entière.
+    </p>
+    <div class="hero-actions">
+      <a href="mailto:noutcheu.libert.joran@gmail.com" class="btn btn-primary">Me contacter →</a>
+      <a href="https://github.com/noutcheu1" target="_blank" class="btn btn-outline">GitHub ↗</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <span class="stat-num">2.5+</span>
+        <span class="stat-lbl">Années d'expérience</span>
+      </div>
+      <div>
+        <span class="stat-num">500k+</span>
+        <span class="stat-lbl">Entrées traitées</span>
+      </div>
+      <div>
+        <span class="stat-num">−80%</span>
+        <span class="stat-lbl">Temps de traitement</span>
+      </div>
+      <div>
+        <span class="stat-num">Bac+5</span>
+        <span class="stat-lbl">Génie Logiciel</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-tags">
+    <div class="tag active">Python</div>
+    <div class="tag active">NLP</div>
+    <div class="tag active">Deep Learning</div>
+    <div class="tag">Langchain</div>
+    <div class="tag">PyTorch</div>
+    <div class="tag">Docker</div>
+    <div class="tag active">CI/CD</div>
+    <div class="tag">GitLab</div>
+    <div class="tag">Pydantic</div>
+    <div class="tag">Scikit-learn</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="fade-up">
+    <div class="section-label">// 01 — À propos</div>
+    <h2 class="section-title">Développeur Python IA<br>& Data Engineer</h2>
+  </div>
+  <div class="about-grid fade-up">
+    <div class="about-text">
+      <p>
+        Étudiant en <strong>Licence 3 Informatique</strong> à l'Université de Rennes, je suis un développeur
+        passionné par la construction de systèmes data fiables et performants. Mon parcours combine
+        un <strong>Master 1 Génie Logiciel</strong> et plus de deux ans d'expérience en production réelle.
+      </p>
+      <p>
+        Je me spécialise dans la <strong>refactorisation et l'industrialisation de code Python</strong> :
+        pipelines ETL robustes, modèles Machine Learning déployés, et outils NLP pour l'analyse
+        de documents. J'applique systématiquement les bonnes pratiques —
+        <strong>typage, tests, documentation, PEP8</strong> — parce que le code lisible est le code maintenable.
+      </p>
+      <p>
+        Actuellement en recherche d'une <strong>alternance de 24 mois</strong> à partir de septembre 2026
+        pour contribuer à des projets ambitieux en ingénierie IA et data.
+      </p>
+    </div>
+    <div class="about-cards">
+      <div class="info-card">
+        <div class="info-card-icon">📍</div>
+        <div>
+          <div class="info-card-label">Localisation</div>
+          <div class="info-card-value">Rennes, Ille-et-Vilaine — Mobilité France entière</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🎓</div>
+        <div>
+          <div class="info-card-label">Formation actuelle</div>
+          <div class="info-card-value">L3 Informatique — Université de Rennes 1</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🔍</div>
+        <div>
+          <div class="info-card-label">Recherche</div>
+          <div class="info-card-value">Alternance 24 mois — Dev Logiciel / Ingénierie IA</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🌍</div>
+        <div>
+          <div class="info-card-label">Langues</div>
+          <div class="info-card-value">Français (maternel) — Anglais B1 technique</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-icon">🤝</div>
+        <div>
+          <div class="info-card-label">Bénévolat</div>
+          <div class="info-card-value">Épifree Rennes — épicerie solidaire étudiante</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="skills-inner">
+    <div class="fade-up">
+      <div class="section-label">// 02 — Compétences techniques</div>
+      <h2 class="section-title">Stack & outils</h2>
+    </div>
+    <div class="skills-grid fade-up">
+      <div class="skill-block">
+        <div class="skill-block-title">Python & Bonnes pratiques</div>
+        <div class="skill-list">
+          <span class="skill-pill hot">Python</span>
+          <span class="skill-pill hot">Typage</span>
+          <span class="skill-pill hot">pytest</span>
+          <span class="skill-pill">PEP8</span>
+          <span class="skill-pill">UV</span>
+          <span class="skill-pill">Packaging</span>
+          <span class="skill-pill hot">Pydantic</span>
+          <span class="skill-pill">dataclasses</span>
+          <span class="skill-pill">Enum</span>
+          <span class="skill-pill">Modularité</span>
+          <span class="skill-pill hot">Sphinx</span>
+          <span class="skill-pill">Markdown</span>
+        </div>
+      </div>
+      <div class="skill-block">
+        <div class="skill-block-title">Machine Learning & Deep Learning</div>
+        <div class="skill-list">
+          <span class="skill-pill hot">Scikit-learn</span>
+          <span class="skill-pill hot">PyTorch</span>
+          <span class="skill-pill hot">Transformers</span>
+          <span class="skill-pill">Sentence-transformers</span>
+          <span class="skill-pill">XGBoost</span>
+          <span class="skill-pill">LightGBM</span>
+          <span class="skill-pill">CatBoost</span>
+          <span class="skill-pill hot">Langchain</span>
+          <span class="skill-pill">Langgraph</span>
+          <span class="skill-pill hot">NLP</span>
+        </div>
+      </div>
+      <div class="skill-block">
+        <div class="skill-block-title">Data Engineering</div>
+        <div class="skill-list">
+          <span class="skill-pill hot">Pandas</span>
+          <span class="skill-pill">Polars</span>
+          <span class="skill-pill">Dask</span>
+          <span class="skill-pill">PySpark</span>
+          <span class="skill-pill hot">PostgreSQL</span>
+          <span class="skill-pill">SQL</span>
+          <span class="skill-pill">PuLP</span>
+          <span class="skill-pill">OR-Tools</span>
+          <span class="skill-pill">ETL Pipelines</span>
+        </div>
+      </div>
+      <div class="skill-block">
+        <div class="skill-block-title">DevOps & Infrastructure</div>
+        <div class="skill-list">
+          <span class="skill-pill hot">Docker</span>
+          <span class="skill-pill">Podman</span>
+          <span class="skill-pill hot">Linux RedHat</span>
+          <span class="skill-pill hot">CI/CD</span>
+          <span class="skill-pill hot">GitLab</span>
+          <span class="skill-pill">Azure DevOps</span>
+          <span class="skill-pill">Git</span>
+          <span class="skill-pill">GitHub</span>
+        </div>
+      </div>
+      <div class="skill-block">
+        <div class="skill-block-title">Full-stack & Outils</div>
+        <div class="skill-list">
+          <span class="skill-pill">Angular</span>
+          <span class="skill-pill">Symfony</span>
+          <span class="skill-pill">Spring Boot</span>
+          <span class="skill-pill">React Native</span>
+          <span class="skill-pill">Flutter</span>
+          <span class="skill-pill">FastAPI</span>
+          <span class="skill-pill">HTML</span>
+          <span class="skill-pill">JavaScript</span>
+          <span class="skill-pill">WebSocket</span>
+        </div>
+      </div>
+      <div class="skill-block">
+        <div class="skill-block-title">Méthodologies</div>
+        <div class="skill-list">
+          <span class="skill-pill hot">Agile / Scrum</span>
+          <span class="skill-pill hot">Revues de code</span>
+          <span class="skill-pill hot">Documentation technique</span>
+          <span class="skill-pill">Pull Requests</span>
+          <span class="skill-pill">Tests unitaires</span>
+          <span class="skill-pill">Tests d'intégration</span>
+          <span class="skill-pill">UAT</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="fade-up">
+    <div class="section-label">// 03 — Expérience professionnelle</div>
+    <h2 class="section-title">Parcours</h2>
+  </div>
+  <div class="timeline fade-up">
+
+    <div class="timeline-item">
+      <div class="timeline-left">
+        <div class="tl-period">09/2022 → 03/2025</div>
+        <div class="tl-company">TrustConsulting</div>
+        <div class="tl-location">Distance / Cameroun</div>
+        <div class="tl-duration">2 ans 6 mois</div>
+      </div>
+      <div class="timeline-right">
+        <div class="tl-role">Ingénieur Logiciel & Développeur Python IA</div>
+        <ul class="tl-bullets">
+          <li>
+            Face à des <strong>pipelines Python non structurés</strong> traitant 500 000+ entrées, j'ai
+            <strong>refactorisé et industrialisé</strong> le code (typage, pytest, documentation Sphinx/Markdown,
+            Pydantic/dataclasses) et rédigé des guides utilisateurs complets.
+            <span class="tl-result">−40% anomalies</span>
+          </li>
+          <li>
+            Développement et documentation de <strong>modèles Scikit-learn</strong> avec Pandas/Polars
+            pour l'automatisation de règles métiers, en <strong>collaboration</strong> étroite avec les équipes.
+            <span class="tl-result">−60% temps de traitement</span>
+          </li>
+          <li>
+            Mise en place d'une chaîne <strong>DevOps complète</strong> (CI/CD, GitLab/Azure DevOps, Docker/Linux)
+            avec revues de code et documentation technique à chaque sprint.
+            <span class="tl-result">−50% délai mise en prod</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-left">
+        <div class="tl-period">04/2023 → 12/2023</div>
+        <div class="tl-company">Afreetech</div>
+        <div class="tl-location">Cameroun</div>
+        <div class="tl-duration">9 mois</div>
+      </div>
+      <div class="timeline-right">
+        <div class="tl-role">Développeur Python — NLP & Deep Learning</div>
+        <ul class="tl-bullets">
+          <li>
+            <strong>Industrialisation</strong> d'un pipeline <strong>NLP / Deep Learning</strong>
+            (transformers HuggingFace, PyTorch, Langchain) avec code typé, PEP8, tests pytest
+            et sorties structurées via Pydantic/Enum.
+            <span class="tl-result">10 min → 2 min (−80%)</span>
+          </li>
+          <li>
+            Déploiement <strong>Docker/Linux RedHat</strong> avec CI/CD GitLab, documentation architecture
+            Sphinx et formation de l'équipe via guides utilisateurs.
+            <span class="tl-result">Reprise autonome J+7</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="projects-inner">
+    <div class="fade-up">
+      <div class="section-label">// 04 — Projets</div>
+      <h2 class="section-title">Réalisations techniques</h2>
+    </div>
+    <div class="projects-grid fade-up">
+
+      <div class="project-card">
+        <div class="project-type">Pipeline IA — Production</div>
+        <div class="project-title">Industrialisation Pipeline NLP Documentaire</div>
+        <div class="project-desc">
+          Refactorisation complète d'un pipeline d'analyse de documents techniques :
+          OCR, extraction d'entités, classification NLP. Code typé, testé, documenté.
+          Déployé sous Docker/Linux RedHat.
+        </div>
+        <div class="project-stack">
+          <span class="stack-tag">Python</span>
+          <span class="stack-tag">NLP</span>
+          <span class="stack-tag">Transformers</span>
+          <span class="stack-tag">Langchain</span>
+          <span class="stack-tag">Pydantic</span>
+          <span class="stack-tag">Docker</span>
+          <span class="stack-tag">Sphinx</span>
+        </div>
+        <div class="project-metric">⚡ −80% temps de traitement par document</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-type">Data Engineering — ETL</div>
+        <div class="project-title">Pipelines ETL avec Moteur de Règles Métiers</div>
+        <div class="project-desc">
+          Développement de 3 pipelines ETL Python traitant 500 000+ entrées avec moteur de règles
+          techniques, validation Pydantic et déploiement CI/CD sur Linux.
+        </div>
+        <div class="project-stack">
+          <span class="stack-tag">Python</span>
+          <span class="stack-tag">Pandas</span>
+          <span class="stack-tag">PostgreSQL</span>
+          <span class="stack-tag">Pydantic</span>
+          <span class="stack-tag">Docker</span>
+          <span class="stack-tag">GitLab CI</span>
+        </div>
+        <div class="project-metric">⚡ −60% temps de préparation des données</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-type">Machine Learning — Exploration</div>
+        <div class="project-title">Benchmark ML Supervisé & Optimisation</div>
+        <div class="project-desc">
+          Comparaison de modèles XGBoost, LightGBM, CatBoost sur données tabulaires Kaggle.
+          Exploration d'optimisation sous contraintes industrielles avec PuLP et OR-Tools.
+        </div>
+        <div class="project-stack">
+          <span class="stack-tag">XGBoost</span>
+          <span class="stack-tag">LightGBM</span>
+          <span class="stack-tag">Scikit-learn</span>
+          <span class="stack-tag">PuLP</span>
+          <span class="stack-tag">OR-Tools</span>
+          <span class="stack-tag">Polars</span>
+        </div>
+        <div class="project-metric">📊 Comparaison multi-modèles + feature engineering</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-type">Deep Learning — NLP Avancé</div>
+        <div class="project-title">Similarité Sémantique & Agents LangGraph</div>
+        <div class="project-desc">
+          Expérimentation PyTorch et sentence-transformers pour la similarité sémantique.
+          Orchestration de flux IA multi-agents avec Langgraph pour des tâches d'analyse.
+        </div>
+        <div class="project-stack">
+          <span class="stack-tag">PyTorch</span>
+          <span class="stack-tag">Sentence-transformers</span>
+          <span class="stack-tag">Langgraph</span>
+          <span class="stack-tag">HuggingFace</span>
+        </div>
+        <div class="project-metric">🤖 Pipeline RAG + agents autonomes</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-type">Mobile — Full-stack</div>
+        <div class="project-title">Application Mobile de Messagerie</div>
+        <div class="project-desc">
+          Application cross-platform de messagerie en temps réel avec communication
+          WebSocket, backend Symfony/Express et frontend React Native/Flutter.
+        </div>
+        <div class="project-stack">
+          <span class="stack-tag">React Native</span>
+          <span class="stack-tag">Flutter</span>
+          <span class="stack-tag">WebSocket</span>
+          <span class="stack-tag">Symfony</span>
+          <span class="stack-tag">Express</span>
+        </div>
+        <div class="project-metric">📱 Cross-platform iOS / Android</div>
+      </div>
+
+      <div class="project-card">
+        <div class="project-type">Data — Big Data</div>
+        <div class="project-title">Traitement Grands Volumes avec Dask & PySpark</div>
+        <div class="project-desc">
+          Exploration du traitement distribué de grands volumes de données avec Dask
+          et PySpark. Structuration du projet avec UV, packaging Python moderne.
+        </div>
+        <div class="project-stack">
+          <span class="stack-tag">Dask</span>
+          <span class="stack-tag">PySpark</span>
+          <span class="stack-tag">Polars</span>
+          <span class="stack-tag">UV</span>
+          <span class="stack-tag">Python</span>
+        </div>
+        <div class="project-metric">📦 Packaging moderne + pipelines distribués</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="fade-up">
+    <div class="section-label">// 05 — Formation</div>
+    <h2 class="section-title">Parcours académique</h2>
+  </div>
+  <div class="edu-grid fade-up">
+    <div class="edu-card">
+      <div class="edu-degree">Licence 3 Informatique</div>
+      <div class="edu-school">Université de Rennes 1 — Rennes, France</div>
+      <div class="edu-period">09/2025 → 06/2026</div>
+      <div class="edu-badge">En cours — Spécialisation Data Science</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-degree">Master 1 Génie Logiciel</div>
+      <div class="edu-school">Université de Yaoundé 1 — Yaoundé, Cameroun</div>
+      <div class="edu-period">09/2019 → 06/2022</div>
+      <div class="edu-badge">Validé — Bac+5 en cours</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-degree">Analyse de données avec Python</div>
+      <div class="edu-school">FreeCodeCamp — Certification</div>
+      <div class="edu-period">2023</div>
+      <div class="edu-badge">Certifié — Pandas, NumPy, Matplotlib</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-degree">Veille IA & Recherche</div>
+      <div class="edu-school">Auto-formation continue</div>
+      <div class="edu-period">2023 → présent</div>
+      <div class="edu-badge">RAG, LLM, Agents autonomes, Architecture ML</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-hero fade-up">
+      <div class="section-label">// 06 — Contact</div>
+      <h2 class="contact-title">Travaillons<br><em>ensemble</em></h2>
+      <p class="contact-sub">Disponible pour une alternance de 24 mois à partir de septembre 2026.</p>
+    </div>
+    <div class="contact-grid fade-up">
+      <a href="mailto:noutcheu.libert.joran@gmail.com" class="contact-card">
+        <span class="contact-card-icon">✉</span>
+        <span class="contact-card-label">Email</span>
+        <span class="contact-card-value">noutcheu.libert.joran@gmail.com</span>
+      </a>
+      <a href="tel:+33759341836" class="contact-card">
+        <span class="contact-card-icon">📱</span>
+        <span class="contact-card-label">Téléphone</span>
+        <span class="contact-card-value">+33 7 59 34 18 36</span>
+      </a>
+      <a href="https://www.linkedin.com/in/libert-joran-noutcheu-14a590200/" target="_blank" class="contact-card">
+        <span class="contact-card-icon">in</span>
+        <span class="contact-card-label">LinkedIn</span>
+        <span class="contact-card-value">libert-joran-noutcheu</span>
+      </a>
+      <a href="https://github.com/noutcheu1" target="_blank" class="contact-card">
+        <span class="contact-card-icon">⌥</span>
+        <span class="contact-card-label">GitHub</span>
+        <span class="contact-card-value">github.com/noutcheu1</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 Libert Noutcheu — Software Engineer & Data Engineer</span>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+</script>
+</body>
+</html>
